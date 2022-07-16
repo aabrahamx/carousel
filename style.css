@@ -55,6 +55,9 @@ p {
   top: 50%;
   cursor: pointer;
   z-index: 5;
+  background: tomato;
+  color: white;
+  font-weight: bold;
 }
 
 #leftBtn {

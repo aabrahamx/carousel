@@ -24,11 +24,12 @@ const template = (moviesArr) => {
 const Controls = (() => {
   let currState = 0;
   let max = null;
+  const containerSize = 200
 
   const setMax = (length) => (max = length - 4);
 
   const leftClick = () => {
-    currState = currState + 200;
+    currState = currState + containerSize;
     root.style.left = currState + 'px';
     rightBtn.style.display = 'block';
     if (currState === 0) {
@@ -37,12 +38,11 @@ const Controls = (() => {
   };
 
   const rightClick = () => {
-    currState = currState - 200;
+    currState = currState - containerSize;
     root.style.left = currState + 'px';
     leftBtn.style.display = 'block';
-    const edge = (max) * (-200);
-    console.log(edge)
-    if (currState === max * -200) {
+    const edge = (max) * (-containerSize);
+    if (currState === edge) {
       rightBtn.style.display = 'none';
     }
   };
