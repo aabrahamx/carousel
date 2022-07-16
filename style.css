@@ -69,6 +69,7 @@ span {
 #leftBtn {
   left: 0;
   transform: translate(-15px, -15px);
+  display: none;
 }
 
 #rightBtn {

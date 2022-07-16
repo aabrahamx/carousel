@@ -2,29 +2,62 @@ const leftBtn = document.getElementById('leftBtn');
 const rightBtn = document.getElementById('rightBtn');
 const root = document.getElementById('root');
 
-const template = (moviesArr) => {
-  let all = '';
+//** --------------- View ----------------------
+const View = (() => {
+  const DOM = {
+    container: '#root',
+    leftBtn: '#leftBtn',
+    rightBtn: '#rightBtn',
+  };
 
-  moviesArr.forEach((movie) => {
-    const { imgUrl, name, outlineInfo } = movie;
-    let template = `
-      <div class="container">
+  const render = (container, content) => {
+    container.innerHTML = content;
+  };
+
+  const generateTemplate = (dataArr) => {
+    return dataArr.reduce((prev, curr) => {
+      const { imgUrl, name, outlineInfo } = curr;
+      return (
+        prev +
+        `
+        <div class="container">
           <img src="${imgUrl}" />
           <p> Movie: <span>${name}</span></p>
           <p> Info: <span>${outlineInfo}</span></p>
-      </div>
-    `;
-    all += template;
-  });
+        </div>
+      `
+      );
+    }, '');
+  };
 
-  root.innerHTML = all;
-};
+  return { render, generateTemplate, DOM };
+})();
 
-//! ~~~~~~~ Controls ~~~~~~~~~~~
+//** --------------- State ----------------------
+const State = (() => {
+  let movies = [];
+
+  const setMovies = (data) => {
+    movies = [...data];
+    View.render(
+      document.querySelector(View.DOM.container),
+      View.generateTemplate(movies)
+    );
+  };
+
+  const getMovies = () => {
+    return movies
+  };
+
+  return { setMovies, getMovies };
+})();
+
+
+//** -------------- Controls ---------------------
 const Controls = (() => {
   let currState = 0;
   let max = null;
-  const containerSize = 200
+  const containerSize = 200;
 
   const setMax = (length) => (max = length - 4);
 
@@ -41,7 +74,7 @@ const Controls = (() => {
     currState = currState - containerSize;
     root.style.left = currState + 'px';
     leftBtn.style.display = 'block';
-    const edge = (max) * (-containerSize);
+    const edge = max * -containerSize;
     if (currState === edge) {
       rightBtn.style.display = 'none';
     }
@@ -50,7 +83,8 @@ const Controls = (() => {
   return { leftClick, rightClick, setMax };
 })();
 
-(() => {
+//! ----
+const init = () => {
   const baseUrl = 'http://localhost:4232/movies';
   fetch(baseUrl)
     .then((response) => {
@@ -60,11 +94,11 @@ const Controls = (() => {
       throw new Error('Network Error');
     })
     .then((jsonReponse) => {
-      template(jsonReponse);
+      State.setMovies(jsonReponse);
       Controls.setMax(jsonReponse.length);
     });
-})();
+};
 
-leftBtn.style.display = 'none';
+init();
 leftBtn.onclick = Controls.leftClick;
 rightBtn.onclick = Controls.rightClick;
