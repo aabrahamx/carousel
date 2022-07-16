@@ -10,8 +10,8 @@ const template = (moviesArr) => {
     let template = `
       <div class="container">
           <img src="${imgUrl}" />
-          <p> movie: ${name} </p>
-          <p> info: ${outlineInfo} </p>
+          <p> Movie: <span>${name}</span></p>
+          <p> Info: <span>${outlineInfo}</span></p>
       </div>
     `;
     all += template;
