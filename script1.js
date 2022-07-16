@@ -6,6 +6,7 @@ const root = document.getElementById('root');
 const View = (() => {
   const DOM = {
     container: '#root',
+    movieWrapper: '.wrapper',
     leftBtn: '#leftBtn',
     rightBtn: '#rightBtn',
   };
@@ -20,7 +21,7 @@ const View = (() => {
       return (
         prev +
         `
-        <div class="container">
+        <div class="wrapper">
           <img src="${imgUrl}" />
           <p> Movie: <span>${name}</span></p>
           <p> Info: <span>${outlineInfo}</span></p>
@@ -30,7 +31,19 @@ const View = (() => {
     }, '');
   };
 
-  return { render, generateTemplate, DOM };
+  const moveContainer = (number) => {
+    document.querySelector(DOM.container).style.left = number + 'px';
+  };
+
+  const show = (el) => {
+    document.querySelector(el).style.display = 'block';
+  };
+
+  const hide = (el) => {
+    document.querySelector(el).style.display = 'none';
+  };
+
+  return { render, generateTemplate, DOM, moveContainer, show, hide };
 })();
 
 //** --------------- State ----------------------
@@ -43,44 +56,70 @@ const State = (() => {
       document.querySelector(View.DOM.container),
       View.generateTemplate(movies)
     );
+    Controls.init();
   };
+
+  const pushMovies = (movies) => movies.push(movies);
+  const shiftMovies = (movies) => movies.shift(movies);
 
   const getMovies = () => {
-    return movies
+    return movies;
   };
 
-  return { setMovies, getMovies };
+  return { setMovies, getMovies, pushMovies, shiftMovies };
 })();
-
 
 //** -------------- Controls ---------------------
 const Controls = (() => {
-  let currState = 0;
-  let max = null;
-  const containerSize = 200;
+  let left = 0;
 
-  const setMax = (length) => (max = length - 4);
+  const getWrapperSize = () => {
+    const wrapper = document.querySelector(View.DOM.movieWrapper);
+    if (wrapper) {
+      return Number(wrapper.clientWidth);
+    }
+    return 200;
+  };
+
+  const leftBoundry = () => 0;
+  const rightBoudry = () => {
+    return (State.getMovies().length - 4) * -getWrapperSize();
+  };
 
   const leftClick = () => {
-    currState = currState + containerSize;
-    root.style.left = currState + 'px';
-    rightBtn.style.display = 'block';
-    if (currState === 0) {
-      leftBtn.style.display = 'none';
+    if (left === leftBoundry()) {
+      View.hide(View.DOM.leftBtn);
     }
+    View.show(View.DOM.rightBtn);
+
+    if (left !== leftBoundry()) {
+      left = left + getWrapperSize();
+      View.moveContainer(left);
+      View.show(View.DOM.leftBtn);
+      return;
+    }
+
+    View.hide(View.DOM.leftBtn);
   };
 
   const rightClick = () => {
-    currState = currState - containerSize;
-    root.style.left = currState + 'px';
-    leftBtn.style.display = 'block';
-    const edge = max * -containerSize;
-    if (currState === edge) {
-      rightBtn.style.display = 'none';
+    View.show(View.DOM.leftBtn);
+
+    if (left !== rightBoudry()) {
+      left = left - getWrapperSize();
+      View.moveContainer(left);
+      View.show(View.DOM.rightBtn);
+      return;
     }
+
+    View.hide(View.DOM.rightBtn);
   };
 
-  return { leftClick, rightClick, setMax };
+  const init = () => {
+    console.log(1);
+  };
+
+  return { leftClick, rightClick, init };
 })();
 
 //! ----
@@ -95,7 +134,6 @@ const init = () => {
     })
     .then((jsonReponse) => {
       State.setMovies(jsonReponse);
-      Controls.setMax(jsonReponse.length);
     });
 };
 
