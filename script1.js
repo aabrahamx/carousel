@@ -81,7 +81,7 @@ const Controls = (() => {
     return 200;
   };
 
-  const leftBoundry = () => 0;
+  const leftBoundry = () => -getWrapperSize();
   const rightBoudry = () => {
     return (State.getMovies().length - 4) * -getWrapperSize();
   };
@@ -90,16 +90,10 @@ const Controls = (() => {
     if (left === leftBoundry()) {
       View.hide(View.DOM.leftBtn);
     }
-    View.show(View.DOM.rightBtn);
 
-    if (left !== leftBoundry()) {
-      left = left + getWrapperSize();
-      View.moveContainer(left);
-      View.show(View.DOM.leftBtn);
-      return;
-    }
-
-    View.hide(View.DOM.leftBtn);
+    left = left + getWrapperSize();
+    View.moveContainer(left);
+    View.show(View.DOM.rightBtn)
   };
 
   const rightClick = () => {
