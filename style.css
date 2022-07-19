@@ -16,25 +16,28 @@ main {
 }
 
 
-#rootWrapper {
+#wrapper_root {
   max-width: 800px;
+  min-width: 800px;
+  min-height: 48vh;
   display: flex;
   justify-content: flex-start;
   overflow: hidden;
+  position: relative;
 }
 
 #root {
   display: flex;
-  position: relative;
-  left: 0;
-  transition: all .5s linear;
 }
 
 
-.wrapper {
-  min-width: 200px;
+.container {
+  width: 200px;
   min-height: 300px;
   padding: 0 5px;
+  position: absolute;
+  top: 0;
+  transition: left .25s ease-in-out;
 }
 
 img {
@@ -51,8 +54,8 @@ span {
 }
 
 
-#leftBtn,
-#rightBtn {
+#btn_left,
+#btn_right {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -67,13 +70,12 @@ span {
   transition: all .4 linear;
 }
 
-#leftBtn {
+#btn_left {
   left: 0;
   transform: translate(-15px, -15px);
-  display: none;
 }
 
-#rightBtn {
+#btn_right {
   right: 0;
   transform: translate(15px, -15px);
 }

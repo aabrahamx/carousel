@@ -18,56 +18,28 @@ const API = (() => {
 
 //* ---------- Model ----------
 const Model = (() => {
-  let nodes = [];
+  const nodes = [];
+  const boundary = {};
 
   const getNodes = () => {
     return nodes;
   };
 
   const setNodes = (data) => {
-    nodes = [...data];
-    let i = -2;
+    nodes.push(...data);
+    const mid = Math.floor(nodes.length / 2);
+
+    boundary.left = -200 * (mid - 1);
+    boundary.right = 200 * (mid + 1);
+
+    let x = boundary.left;
     nodes.forEach((node) => {
-      node.style.left = 200 * i + 'px';
-      i += 1;
+      node.style.left = x + 'px';
+      x += 200;
     });
   };
 
-  const shiftToTail = () => {
-    nodes.slice(0, 4).forEach((node) => {
-      const currentEnd = nodes[nodes.length - 1];
-      const pos = parseInt(currentEnd.style.left, 10);
-
-      node.style.display = 'none';
-      node.style.left = pos + 200 + 'px';
-      setTimeout(() => (node.style.display = 'block'), 250);
-
-      nodes.push(nodes.shift());
-    });
-
-    // const currEndPos = parseInt(nodes[nodes.length - 1].style.left, 10)
-    // const currHead = nodes.shift()
-    // currHead.style.display = 'none';
-    // currHead.style.left = currEndPos + 200 + 'px'
-    // //setTimeout(() => (nodes[0].style.display = 'block'), 250);
-    // console.log(currHead)
-    // nodes.push(currHead);
-  };
-
-  const shiftToHead = () => {
-    nodes.slice(nodes.length - 2).forEach((node) => {
-      const currentHead = nodes[0];
-      const pos = parseInt(currentHead.style.left, 10);
-
-      node.style.display = 'none';
-      node.style.left = pos - 200 + 'px';
-      setTimeout(() => (node.style.display = 'block'), 250);
-
-      nodes.unshift(nodes.pop());
-    });
-  };
-
-  return { getNodes, setNodes, shiftToTail, shiftToHead };
+  return { getNodes, setNodes, boundary };
 })();
 
 //* ---------  View  ------------
@@ -103,31 +75,33 @@ const View = (() => {
 //* --------- Controller -------------
 const Controller = (() => {
   const moveRight = () => {
-    const nodes = Model.getNodes();
-    const currHead = parseInt(nodes[0].style.left, 10);
-
-    nodes.forEach((node) => {
+    Model.getNodes().forEach((node) => {
       const pos = parseInt(node.style.left, 10);
-      node.style.left = pos + 200 + 'px';
-    });
 
-    if (currHead > -400) {
-      Model.shiftToHead();
-    }
+      pos === Model.boundary.right
+        ? shift(node, Model.boundary.left)
+        : move(node, pos + 200);
+    });
   };
 
   const moveLeft = () => {
-    const nodes = Model.getNodes();
-    const currHead = parseInt(nodes[0].style.left, 10);
+    Model.getNodes().forEach((node) => {
+      pos = parseInt(node.style.left, 10);
 
-    if (currHead === -800) {
-      Model.shiftToTail();
-    }
-
-    nodes.forEach((node) => {
-      const pos = parseInt(node.style.left, 10);
-      node.style.left = pos - 200 + 'px';
+      pos === Model.boundary.left
+        ? shift(node, Model.boundary.right)
+        : move(node, pos - 200);
     });
+  };
+
+  const shift = (element, position) => {
+    document.querySelector(View.DOM.root).removeChild(element);
+    element.style.left = position + 'px';
+    document.querySelector(View.DOM.root).append(element);
+  };
+
+  const move = (element, position) => {
+    element.style.left = position + 'px';
   };
 
   const init = async () => {
@@ -149,7 +123,3 @@ const Controller = (() => {
 })();
 
 window.onload = Controller.init;
-
-// function getLeftPos() {
-//   return parseInt(this.style.left, 10)
-// }
